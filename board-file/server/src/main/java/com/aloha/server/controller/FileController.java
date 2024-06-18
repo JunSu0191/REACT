@@ -17,8 +17,6 @@ import com.aloha.server.dto.Files;
 import com.aloha.server.service.FileService;
 
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-
 
 
 /**
@@ -28,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
  * ⭐ 파일 썸네일
  * ⭐ 파일 삭제
  */
-@Slf4j
 @RestController
 @CrossOrigin(origins = "*")
 @RequestMapping("/files")
@@ -46,19 +43,21 @@ public class FileController {
     public ResponseEntity<?> create(@RequestBody Files file) {
         try {
             Files newFileNo = fileService.upload(file);
-            log.info("newFileNo : " + newFileNo);
             return new ResponseEntity<>(newFileNo, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
+    /**
+     * 파일 다운로드
+     * @param no
+     * @param response
+     * @throws Exception
+     */
     @GetMapping("/{no}")
-    public void fileDownload(@PathVariable("no") int no
-                              ,HttpServletResponse response) throws Exception {
-
-                                fileService.download(no, response);
+    public void fileDownload(@PathVariable("no") int no, HttpServletResponse response) throws Exception{
+        fileService.download(no, response);
     }
-    
     
 }

@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
-public class BoardServiceImpl implements BoardService {
+public class BoardServiceImpl implements BoardService{
 
     @Autowired
     private BoardMapper boardMapper;
@@ -24,8 +24,17 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public List<Board> list() throws Exception {
+       return boardMapper.list();
+    }
 
-        return boardMapper.list();
+    @Override
+    public Board select(int no) throws Exception {
+        return boardMapper.select(no);
+    }
+
+    @Override
+    public int update(Board board) throws Exception {
+        return boardMapper.update(board);
     }
 
     @Override
@@ -33,9 +42,7 @@ public class BoardServiceImpl implements BoardService {
         int result = boardMapper.insert(board);
         log.info("result : " + result);
         int newNo = board.getNo();
-        log.info(newNo+"뉴넘입니다");
         Board newBoard = boardMapper.select(newNo);
-        log.info(newBoard + "뉴보드아ㅣㅂ니다");
 
         // 파일 업로드
         Files fileInfo = new Files();
@@ -43,43 +50,26 @@ public class BoardServiceImpl implements BoardService {
         fileInfo.setParentTable(parentTable);
         fileInfo.setParentNo(newNo);
         List<MultipartFile> fileList = board.getFiles();
-        log.info("fileList : " + fileList);
 
-        if ( fileList == null || fileList.isEmpty()) {
+        if( fileList == null || fileList.isEmpty() ) {
             log.info("첨부한 파일이 없습니다.");
             return newBoard;
         }
 
         List<Files> uploadedFileList = fileService.uploadFiles(fileInfo, fileList);
-        log.info("-----------!!!!!!!!!!!!!!" + uploadedFileList);
-        if ( uploadedFileList == null || uploadedFileList.isEmpty()) {
+        if( uploadedFileList == null || uploadedFileList.isEmpty() ) {
             log.info("파일 업로드 실패...");
         }
         else {
             log.info("파일 업로드 성공");
             log.info(uploadedFileList.toString());
         }
-
         return newBoard;
     }
 
     @Override
-    public Board select(int no) throws Exception {
-
-        return boardMapper.select(no);
-    }
-
-    @Override
-    public int update(Board board) throws Exception {
-
-        return boardMapper.update(board);
-    }
-
-    @Override
     public int delete(int no) throws Exception {
-
         return boardMapper.delete(no);
     }
-
     
 }
