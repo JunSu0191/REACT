@@ -1,12 +1,14 @@
 package com.aloha.server.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aloha.server.dto.Files;
 import com.aloha.server.mapper.FileMapper;
 
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -57,14 +61,14 @@ public class FileServiceImpl implements FileService{
         if( uploadedFile != null ) {
             log.info("파일 업로드 성공!");
         }
-
         return uploadedFile;
     }
     
     public Files uploadFile(Files fileInfo, MultipartFile file) throws Exception {
         int result = 0;
-
-        if( file.isEmpty() ) return null;
+        log.info("upload : " + file);
+        if( file.isEmpty() ) 
+        return null;
 
         // 파일 원본명, 사이즈, 데이터
         String originName = file.getOriginalFilename();
@@ -98,12 +102,65 @@ public class FileServiceImpl implements FileService{
     public List<Files> uploadFiles(Files fileInfo, List<MultipartFile> fileList) throws Exception {
         
         List<Files> uploadedFileList = new ArrayList<Files>();
+        
 
         for (MultipartFile file : fileList) {
             Files uploadedFile = uploadFile(fileInfo, file);
             uploadedFileList.add(uploadedFile);
             log.info("업로드된 파일 : " + uploadedFile);
         }
+        log.info("uploadedFileList : " + uploadedFileList);
         return uploadedFileList;
     }
+
+    @Override
+    public List<Files> listByParent(Files file) throws Exception {
+
+        List<Files> fileList = fileMapper.listByParent(file);
+        return fileList;
+    }
+
+    @Override
+    public int download(int no, HttpServletResponse response) throws Exception {
+        Files file = fileMapper.select(no);
+
+        if( file == null ) {
+            // BAD_REQUEST : 400, 클라이언트의 요청이 잘못되었음을 알리는 상태코드
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return 0;
+        }
+        String filePath = file.getFilePath();   //파일 경로
+        String fileName = file.getFileName();   //파일 이름
+
+        // 파일 다운로드를 위한 🎫 헤더 세팅
+        // Content-Type : application/octect-stream
+        // - Content-Disposition : attachment, filename="파일명.확장자"
+        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        response.setHeader("Content-Disposition", 
+                            "attatchment; filename=\"" + fileName + "\"");
+
+        // 📄⬇ 파일 다운로드
+        // - 파일 입력
+        File downloadFile = new File(filePath);
+        FileInputStream fis = new FileInputStream(downloadFile);
+
+        // - 파일 출력
+        ServletOutputStream sos = response.getOutputStream();
+
+        // - 다운로드
+        FileCopyUtils.copy(fis, sos);
+
+        // byte[] buffer = new byte[1024];             // 1024bytes : 1KB
+        // int data;
+        // while ((data = fis.read(buffer)) != 1) {    // 1KB 입력
+        //     sos.write(buffer, 0, data);         // 1KB 출력 (전송)
+        // }
+
+        fis.close();
+        sos.close();
+
+        return 1;
+    }
+
+    
 }

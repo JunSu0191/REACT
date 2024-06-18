@@ -47,4 +47,13 @@
         WHERE no = #{no}
     </delete>
 
+    <!-- 파일 목록 - 부모 테이블 기준 -->
+    <select id="listBytParent" resultType="Files">
+        SELECT *
+        FROM file_1
+        WHERE parent_table = #{parentTable}
+        AND   parent_no = #{parentNo}
+        ORDER BY reg_date DESC
+    </select>
+
 </mapper>

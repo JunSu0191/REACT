@@ -33,14 +33,17 @@ public class BoardServiceImpl implements BoardService {
         int result = boardMapper.insert(board);
         log.info("result : " + result);
         int newNo = board.getNo();
+        log.info(newNo+"뉴넘입니다");
         Board newBoard = boardMapper.select(newNo);
+        log.info(newBoard + "뉴보드아ㅣㅂ니다");
 
         // 파일 업로드
         Files fileInfo = new Files();
-        String parentTalbe = "board";
-        fileInfo.setParentTable(parentTalbe);
+        String parentTable = "board";
+        fileInfo.setParentTable(parentTable);
         fileInfo.setParentNo(newNo);
         List<MultipartFile> fileList = board.getFiles();
+        log.info("fileList : " + fileList);
 
         if ( fileList == null || fileList.isEmpty()) {
             log.info("첨부한 파일이 없습니다.");
@@ -48,7 +51,8 @@ public class BoardServiceImpl implements BoardService {
         }
 
         List<Files> uploadedFileList = fileService.uploadFiles(fileInfo, fileList);
-        if ( uploadedFileList == null | uploadedFileList.isEmpty()) {
+        log.info("-----------!!!!!!!!!!!!!!" + uploadedFileList);
+        if ( uploadedFileList == null || uploadedFileList.isEmpty()) {
             log.info("파일 업로드 실패...");
         }
         else {

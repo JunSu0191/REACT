@@ -18,5 +18,8 @@ public interface FileMapper {
     public int update(Files file) throws Exception;
  
     public int delete(int no) throws Exception;
+
+    // 파일 목록 - 부모 기준
+    public List<Files> listByParent(Files file) throws Exception;
     
 }
