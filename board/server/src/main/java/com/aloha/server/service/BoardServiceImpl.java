@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import com.aloha.server.dto.Board;
 import com.aloha.server.mapper.BoardMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class BoardServiceImpl implements BoardService {
 
@@ -21,9 +24,14 @@ public class BoardServiceImpl implements BoardService {
     }
 
     @Override
-    public int insert(Board board) throws Exception {
+    public Board insert(Board board) throws Exception {
 
-        return boardMapper.insert(board);
+        int result = boardMapper.insert(board);
+        log.info("result : " + result);
+        int newNo = board.getNo();
+        Board newBoard = boardMapper.select(newNo);
+
+        return newBoard;
     }
 
     @Override
