@@ -11,6 +11,7 @@ const ReadContainer = ({ no }) => {
   const [fileList, setFileList] = useState([])
   const [isLoading, setLoading] = useState(false)
 
+
   // 🌞 함수
   const getBoard = async () => {
     // ⌚ 로딩 시작
