@@ -13,7 +13,7 @@ function App() {
   return (
     <div className="App">
       <h1>bootstrap</h1>
-      <h3>리액트 부트스트랩 버튼</h3>
+      <h3>리액트 부트스트랩 버튼안녕</h3>
       <ReactButton/>
       <h3>기본 버튼</h3>
       <Button />
